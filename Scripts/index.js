@@ -567,8 +567,6 @@ animate();
 
 // Create score submission form
 function createScoreForm() {
-    console.log(123);
-    
     const form = document.createElement('div');
     form.id = 'scoreForm';
     form.style.cssText = `
@@ -598,7 +596,10 @@ function createScoreForm() {
     `;
 
     form.querySelector('#submitScoreBtn').addEventListener('click', () => {
-        const username = document.getElementById('usernameInput').value.trim();
+        let input = document.querySelectorAll('#usernameInput');
+        input.forEach(name => {
+            if (name.value) username = name.value.trim()  
+        });
         if (username) {
             submitScore(username, gameState.score, gameState.countdown);
             gameState.ecran.removeChild(form);

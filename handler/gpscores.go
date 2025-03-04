@@ -2,7 +2,6 @@ package game
 
 import (
 	"encoding/json"
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -35,7 +34,6 @@ func ScoreHandler(w http.ResponseWriter, r *http.Request) {
 	dir, err1 := os.Getwd()
 
 	if err1 != nil {
-		fmt.Println(err1)
 		http.Error(w, "Internal Server Error: Could not find ", http.StatusInternalServerError)
 		os.Exit(1)
 	}
@@ -78,8 +76,6 @@ func ScoreHandler(w http.ResponseWriter, r *http.Request) {
 				if all[i].Score < all[j].Score {
 					all[i], all[j] = all[j], all[i]
 				} else if all[i].Score == all[j].Score {
-					fmt.Println(all[i].Timing, all[i].Username)
-					fmt.Println(all[j].Timing, all[j].Username)
 					if all[i].Timing < all[j].Timing {
 						all[i], all[j] = all[j], all[i]
 					}
@@ -97,7 +93,6 @@ func ScoreHandler(w http.ResponseWriter, r *http.Request) {
 		os.WriteFile(jsonfile, dataJSON, 0o666)
 
 	}
-	fmt.Println(len(all))
 	if len(all) < 5 {
 		WriteJson(w, 200, UserResponse{All: all})
 	} else {
@@ -108,7 +103,6 @@ func ScoreHandler(w http.ResponseWriter, r *http.Request) {
 func WriteJson(w http.ResponseWriter, status int, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	fmt.Println(status)
 	err := json.NewEncoder(w).Encode(data)
 	if err != nil {
 		log.Printf("Unexpected Error %s", err.Error())
