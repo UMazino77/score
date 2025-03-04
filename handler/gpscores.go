@@ -93,11 +93,7 @@ func ScoreHandler(w http.ResponseWriter, r *http.Request) {
 		os.WriteFile(jsonfile, dataJSON, 0o666)
 
 	}
-	if len(all) < 5 {
-		WriteJson(w, 200, UserResponse{All: all})
-	} else {
-		WriteJson(w, 200, UserResponse{All: all[:5]})
-	}
+	WriteJson(w, 200, UserResponse{All: all})
 }
 
 func WriteJson(w http.ResponseWriter, status int, data interface{}) {

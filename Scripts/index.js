@@ -685,7 +685,7 @@ function displayScoreTable(data) {
                 <tbody>
     `;
 
-    if (data.all && data.all.length > 0) {
+    if (data.all && data.all.length > 0) {        
         data.all.forEach(score => {
             tableHTML += `
                 <tr>
@@ -707,8 +707,16 @@ function displayScoreTable(data) {
     tableHTML += `
                 </tbody>
             </table>
-            <div style="margin-top: 20px; display: flex; justify-content: center;">
+            <div id="page" style="margin-top: 20px; display: flex; justify-content: center;">
     `;
+    let pages = Math.ceil(data.all.length/5) 
+    for (let i =1; i<= pages; i++) {
+        console.log(pages);
+        
+        tableHTML += `
+            <button id="closeScoreTableBtn" style="cursor: pointer; border-radius: 8px; padding: 6px; margin-top: 20px;">${i}</button>
+        `;
+    };
 
     tableHTML += `
             </div>

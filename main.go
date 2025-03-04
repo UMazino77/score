@@ -19,8 +19,8 @@ func main() {
 	http.HandleFunc("/", game.GameHandler)
 	http.HandleFunc("/score", game.ScoreHandler)
 
-	fmt.Println("Server starting on http://localhost:4444")
-	if err := http.ListenAndServe(":4444", nil); err != nil {
+	fmt.Println("Server starting on http://localhost:8404")
+	if err := http.ListenAndServe(":8404", nil); err != nil {
 		fmt.Println("Server error:", err)
 		os.Exit(1)
 	}
