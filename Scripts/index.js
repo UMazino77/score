@@ -643,7 +643,7 @@ function showScoreTable(pageNumber = 0) {
     fetch(`/score?page-number=${pageNumber}`)
         .then(response => response.json())
         .then(data => {
-            displayScoreTable(data);
+            displayScoreTable(data, pageNumber);
         })
         .catch(error => {
             console.error('Error fetching scores:', error);
@@ -651,7 +651,7 @@ function showScoreTable(pageNumber = 0) {
 }
 
 // Function to display score table
-function displayScoreTable(data) {
+function displayScoreTable(data, page = 0) {
     const tableContainer = document.createElement('div');
     tableContainer.id = 'scoreTableContainer';
     tableContainer.style.cssText = `
@@ -685,8 +685,11 @@ function displayScoreTable(data) {
                 <tbody>
     `;
 
-    if (data.all && data.all.length > 0) {        
+    if (data.all && data.all.length > 0) {  
+        let  counter = 0      
         data.all.forEach(score => {
+            counter++;
+            if (counter < data.all.length && counter >= page*5 && counter <= (page+1)*5 ){
             tableHTML += `
                 <tr>
                     <td style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.3);">${score.ranking}</td>
@@ -694,8 +697,11 @@ function displayScoreTable(data) {
                     <td style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.3);">${score.score}</td>
                     <td style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.3);">${score.timing}</td>
                 </tr>
-            `;
+            `;}
+
         });
+
+
     } else {
         tableHTML += `
             <tr>
@@ -707,48 +713,45 @@ function displayScoreTable(data) {
     tableHTML += `
                 </tbody>
             </table>
-            <div id="page" style="margin-top: 20px; display: flex; justify-content: center;">
+            <div id="pagess" style="margin-top: 20px; display: flex; justify-content: center;">
     `;
+    //console.log(data.all);
+
     let pages = Math.ceil(data.all.length/5) 
+    //console.log(pages)
     for (let i =1; i<= pages; i++) {
-        console.log(pages);
+        //console.log(i);
         
         tableHTML += `
-            <button id="closeScoreTableBtn" style="cursor: pointer; border-radius: 8px; padding: 6px; margin-top: 20px;">${i}</button>
+            <button class="pagine" style="cursor: pointer; border-radius: 8px; padding: 6px; margin-top: 20px;">${i}</button>
         `;
     };
 
+    
     tableHTML += `
             </div>
             <button id="closeScoreTableBtn" style="cursor: pointer; border-radius: 8px; padding: 6px; margin-top: 20px;">Close</button>
         </div>
     `;
 
-    tableContainer.innerHTML = tableHTML;
+    let pagin = document.getElementsByClassName('pagine');
 
-    // Event listeners for pagination
-    if (data.pages > 1) {
-        const prevBtn = tableContainer.querySelector('#prevPageBtn');
-        const nextBtn = tableContainer.querySelector('#nextPageBtn');
-        
-        if (prevBtn) {
-            prevBtn.addEventListener('click', () => {
-                if (data.pagenumber > 0) {
-                    gameState.ecran.removeChild(tableContainer);
-                    showScoreTable(0);
-                }
-            });
-        }
-        
-        if (nextBtn) {
-            nextBtn.addEventListener('click', () => {
-                if (data.pagenumber < data.pages - 1) {
-                    gameState.ecran.removeChild(tableContainer);
-                    showScoreTable(data.pagenumber + 1);
-                }
-            });
-        }
-    }
+    console.log(pagin)
+
+    console.log(pagin.length)
+
+    /*pagin.forEach(page => {
+        page.addEventListener("click", () => {
+            let pagenbr = page.textContent
+
+            console.log(pagenbr)
+
+            displayScoreTable(data, pagenbr)
+        })
+       console.log(page.textContent)
+    });*/
+
+    tableContainer.innerHTML = tableHTML;
 
     tableContainer.querySelector('#closeScoreTableBtn').addEventListener('click', () => {
         gameState.ecran.removeChild(tableContainer);
