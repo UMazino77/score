@@ -603,7 +603,6 @@ function createScoreForm() {
         if (username) {
             submitScore(username, gameState.score, gameState.countdown);
             gameState.ecran.removeChild(form);
-            showScoreTable();
         }
     });
 
@@ -639,11 +638,11 @@ function submitScore(username, score, time) {
 }
 
 // Function to show score table
-function showScoreTable(pageNumber = 0) {
-    fetch(`/score?page-number=${pageNumber}`)
+function showScoreTable() {
+    fetch(`/score`)
         .then(response => response.json())
         .then(data => {
-            displayScoreTable(data, pageNumber);
+            displayScoreTable(data, 1);
         })
         .catch(error => {
             console.error('Error fetching scores:', error);
@@ -651,7 +650,7 @@ function showScoreTable(pageNumber = 0) {
 }
 
 // Function to display score table
-function displayScoreTable(data, page = 0) {
+function displayScoreTable(data, page = 1) {
     const tableContainer = document.createElement('div');
     tableContainer.id = 'scoreTableContainer';
     tableContainer.style.cssText = `
@@ -686,20 +685,21 @@ function displayScoreTable(data, page = 0) {
     `;
 
     if (data.all && data.all.length > 0) {  
-        let  counter = 0      
-        data.all.forEach(score => {
-            counter++;
-            if (counter < data.all.length && counter >= page*5 && counter <= (page+1)*5 ){
+        page-- ;
+        for (let i =page*5; i<(page+1)*5; i++) {
+            
+            if (i < data.all.length){
+                
             tableHTML += `
                 <tr>
-                    <td style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.3);">${score.ranking}</td>
-                    <td style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.3);">${score.username}</td>
-                    <td style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.3);">${score.score}</td>
-                    <td style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.3);">${score.timing}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.3);">${data.all[i].ranking}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.3);">${data.all[i].username}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.3);">${data.all[i].score}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.3);">${data.all[i].timing}</td>
                 </tr>
             `;}
 
-        });
+        };
 
 
     } else {
@@ -715,15 +715,11 @@ function displayScoreTable(data, page = 0) {
             </table>
             <div id="pagess" style="margin-top: 20px; display: flex; justify-content: center;">
     `;
-    //console.log(data.all);
 
     let pages = Math.ceil(data.all.length/5) 
-    //console.log(pages)
-    for (let i =1; i<= pages; i++) {
-        //console.log(i);
-        
+    for (let i =1; i<= pages; i++) {        
         tableHTML += `
-            <button class="pagine" style="cursor: pointer; border-radius: 8px; padding: 6px; margin-top: 20px;">${i}</button>
+            <button class="num-page" id="${i}" style="cursor: pointer; border-radius: 8px; padding: 6px; margin-top: 20px;">${i}</button>
         `;
     };
 
@@ -734,31 +730,29 @@ function displayScoreTable(data, page = 0) {
         </div>
     `;
 
-    let pagin = document.getElementsByClassName('pagine');
-
-    console.log(pagin)
-
-    console.log(pagin.length)
-
-    /*pagin.forEach(page => {
-        page.addEventListener("click", () => {
-            let pagenbr = page.textContent
-
-            console.log(pagenbr)
-
-            displayScoreTable(data, pagenbr)
-        })
-       console.log(page.textContent)
-    });*/
-
     tableContainer.innerHTML = tableHTML;
+    gameState.ecran.appendChild(tableContainer);
+
+
+    const Buttons = document.querySelectorAll(".num-page")
+
+    Buttons.forEach((button)=> {
+
+        const handlepagination = function() {
+            tableContainer.innerHTML = ``
+
+            displayScoreTable(data, button.id)
+        }
+        button.removeEventListener("click" , handlepagination)   
+        button.addEventListener("click" , handlepagination)   
+
+    })
 
     tableContainer.querySelector('#closeScoreTableBtn').addEventListener('click', () => {
         gameState.ecran.removeChild(tableContainer);
         showGameMenu(gameState.invaders.length === 0);
     });
 
-    gameState.ecran.appendChild(tableContainer);
 }
 
 // Add a leaderboard button to game menu
@@ -808,26 +802,5 @@ function setupHeader() {
     header.style.height = "40px";
     header.style.top = "10px";
     header.style.border = "1px solid rgb(255, 255, 255)";
-    
-    const scoresBtn = document.createElement('button');
-    scoresBtn.textContent = "High Scores";
-    scoresBtn.style.cssText = `
-        position: absolute;
-        right: 20px;
-        top: 10px;
-        cursor: pointer;
-        border-radius: 8px;
-        padding: 6px;
-        z-index: 100;
-    `;
-    scoresBtn.addEventListener('click', () => {
-        if (!gameState.isPaused) {
-            gameState.isPaused = true;
-            clearInterval(timer_death);
-            showScoreTable();
-        }
-    });
-    
     gameContainer.appendChild(header);
-    gameContainer.appendChild(scoresBtn);
 }
